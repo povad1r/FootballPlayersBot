@@ -22,8 +22,10 @@ def parse_info(link):
     response = requests.get(URL, headers=headers)
 
     soup = bs(response.content, "html.parser")
-    shirt_number = soup.find("span", class_="data-header__shirt-number").get_text(strip=True)
-    name_surname = soup.find("strong").get_text(strip=True)
+    player_short_info = soup.find("h1", class_='data-header__headline-wrapper').get_text().split()
+    shirt_number = player_short_info[0]
+    delimiter = ' '
+    name_surname = delimiter.join(player_short_info[1:3])
     club = soup.find("span", class_='data-header__club').get_text(strip=True)
     transfer_price = soup.find("a", class_='data-header__market-value-wrapper').get_text(strip=True)
     transfer_price_without_last_update = transfer_price.split("Last update:")[0]

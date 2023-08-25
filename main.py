@@ -30,7 +30,7 @@ async def get_player_info(message: types.Message):
     link = get_link(query)
     player_info = parse_info(link)
     response = (
-        f"\n\nSurname: {player_info['name_surname']}\nShirt Number: {player_info['shirt_number']}\nDate of birth: {player_info['date_of_birth']}\nNationality: {player_info['nationality']}\nClub: {player_info['club']}\nTransfer value: {player_info['transfer_price']}")
+        f"\nFull Name: {player_info['name_surname']}\nShirt Number: {player_info['shirt_number']}\nDate of birth: {player_info['date_of_birth']}\nNationality: {player_info['nationality']}\nClub: {player_info['club']}\nTransfer value: {player_info['transfer_price']}")
     await message.answer(response)
 
 
