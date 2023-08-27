@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup as bs
+
+
 def get_link(query):
+    print(query)
     URL = f'https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query={query}'
 
     headers = {
@@ -13,6 +16,7 @@ def get_link(query):
     link = ' https://www.transfermarkt.com' + first.get("href")
 
     return link
+
 
 def parse_info(link):
     URL = link
@@ -42,3 +46,36 @@ def parse_info(link):
     return player_info
 
 
+def get_player_performance_data(link):
+    base_url = "https://www.transfermarkt.com/ceapi/player/"
+    full_name = link.split('/')[-1]
+    url = f"{base_url}{full_name}/performance"
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
+
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    games_played = 0
+    goals_scored = 0
+    assists = 0
+    red_cards = 0
+    yellow_cards = 0
+    for entry in data:
+        games_played += entry["gamesPlayed"]
+        goals_scored += entry["goalsScored"]
+        assists += entry["assists"]
+        yellow_cards += entry["yellowCards"]
+        red_cards += entry["redCards"]
+
+    statistics = {
+        'games_played': games_played,
+        'goals_scored': goals_scored,
+        'assists': assists,
+        'yellow_cards': yellow_cards,
+        'red_cards': red_cards
+    }
+
+    return statistics
