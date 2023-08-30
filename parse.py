@@ -1,32 +1,28 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 import requests
 from bs4 import BeautifulSoup as bs
-import time
-import arsenic
-
 
 def get_match_link(link):
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')  # Add this line to enable headless mode
-    options.add_argument(
-        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36')
-    driver = webdriver.Chrome(options=options)
-    driver.get(link)
+    base_url = "https://www.transfermarkt.com/ceapi/nextMatches/player/"
+    full_name = link.split('/')[-1]
 
-    try:
-        odds_serve_span = driver.find_element(By.XPATH,
-                                              '//*[@id="main"]/main/div[3]/div[2]/tm-next-matches/div[3]/span')
-        data_match = odds_serve_span.get_attribute('data-match')
-        return data_match
-    except:
-        print("Element not found")
-    finally:
-        driver.quit()
+    url = f"{base_url}{full_name}"
+    print(url)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
 
-async def get_match_info(data_match):
-    url = f'https://www.transfermarkt.com/spielbericht/index/spielbericht/{data_match}'
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    matches = data.get("matches", [])
+    for match_info in matches:
+        match_state = match_info.get("match", {}).get("state", "")
+        if match_state != "Played":
+            match_id = match_info.get("id")
+            return match_id
+
+
+def get_match_info(match_id):
+    url = f'https://www.transfermarkt.com/spielbericht/index/spielbericht/{match_id}'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
@@ -52,5 +48,3 @@ async def get_match_info(data_match):
         'competition': competition
     }
     return match
-
-

@@ -4,12 +4,12 @@ from bs4 import BeautifulSoup as bs
 
 def get_link(query):
     print(query)
-    URL = f'https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query={query}'
+    url = f'https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query={query}'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
-    response = requests.get(URL, headers=headers)
+    response = requests.get(url, headers=headers)
 
     soup = bs(response.content, "html.parser")
     first = soup.select_one(f'td.hauptlink > a[title*="{query}"]')
@@ -19,11 +19,11 @@ def get_link(query):
 
 
 def parse_info(link):
-    URL = link
+    url = link
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
-    response = requests.get(URL, headers=headers)
+    response = requests.get(url, headers=headers)
 
     soup = bs(response.content, "html.parser")
     player_short_info = soup.find("h1", class_='data-header__headline-wrapper').get_text().split()
@@ -79,3 +79,21 @@ def get_player_performance_data(link):
     }
 
     return statistics
+
+
+def get_achievements(link: str):
+    url = link.replace('/profil', '/erfolge')
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+
+    response = requests.get(url, headers=headers)
+
+    soup = bs(response.content, "html.parser")
+    achieve = soup.select('h2', class_='content-box-headline')
+    list_of_achievements = []
+    for i in achieve[:-1]:
+        list_of_achievements.append(i.get_text(strip=True))
+    return list_of_achievements
+
+
